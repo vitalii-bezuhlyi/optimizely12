@@ -4,9 +4,22 @@ using Microsoft.Extensions.Hosting;
 
 namespace Cms12Local.Security;
 
+// Safety net for the local Blackbird OpenID Connect clients: ensures the validated principal
+// carries editor role claims and a stable name/nameidentifier so EPiServer's ACL evaluator
+// grants access to Content Management API endpoints.
+//
+// For the client_credentials flow, ClientCredentialsRolesEnricher already bakes these role
+// claims into the issued JWT, so this transformation is mostly a no-op there. For the
+// resource-owner-password flow with an OpenID Connect user that lacks the expected role
+// mapping, this transformation still fills in the gap.
 public class BlackbirdLocalClientClaimsTransformation : IClaimsTransformation
 {
-    private const string LocalClientId = "blackbird-local";
+    private static readonly HashSet<string> LocalClientIds = new(StringComparer.Ordinal)
+    {
+        "blackbird-local",
+        "blackbird-cc",
+    };
+
     private static readonly string[] ClientIdentifierClaimTypes =
     [
         "client_id",
@@ -24,6 +37,7 @@ public class BlackbirdLocalClientClaimsTransformation : IClaimsTransformation
 
     private static readonly string[] RoleNames =
     [
+        "Administrators",
         "WebEditors",
         "WebAdmins",
         "CmsEditors",
@@ -52,9 +66,9 @@ public class BlackbirdLocalClientClaimsTransformation : IClaimsTransformation
 
         var clientId = ClientIdentifierClaimTypes
             .Select(claimType => principal.FindFirst(claimType)?.Value)
-            .FirstOrDefault(value => string.Equals(value, LocalClientId, StringComparison.Ordinal));
+            .FirstOrDefault(value => value is not null && LocalClientIds.Contains(value));
 
-        if (!string.Equals(clientId, LocalClientId, StringComparison.Ordinal))
+        if (clientId is null)
         {
             return Task.FromResult(principal);
         }
@@ -87,12 +101,11 @@ public class BlackbirdLocalClientClaimsTransformation : IClaimsTransformation
             }
         }
 
-        if (claims.Count == 0)
+        foreach (var claim in claims)
         {
-            return Task.FromResult(principal);
+            identity.AddClaim(claim);
         }
 
-        principal.AddIdentity(new ClaimsIdentity(claims, identity.AuthenticationType, identity.NameClaimType, identity.RoleClaimType));
         return Task.FromResult(principal);
     }
 }

@@ -1,0 +1,21 @@
+@using EPiServer.Core
+@model Cms12Local.Models.Blocks.FeatureContentBlock
+
+<div class="feature-content-block">
+    @if (!ContentReference.IsNullOrEmpty(Model.Image))
+    {
+        <div class="img-wrapper mb-3" epi-property="@Model.Image">
+            <img src="@Url.ContentUrl(Model.Image)" />
+        </div>
+    }
+    <h2 epi-property="@Model.Heading">@Model.Heading</h2>
+    @if (!string.IsNullOrWhiteSpace(Model.SubHeading))
+    {
+        <p class="lead" epi-property="@Model.SubHeading">@Model.SubHeading</p>
+    }
+    <div epi-property="@Model.Body">@Html.Raw(Model.Body)</div>
+    @if (!string.IsNullOrWhiteSpace(Model.CtaLabel))
+    {
+        <span class="btn btn-primary" epi-property="@Model.CtaLabel">@Model.CtaLabel</span>
+    }
+</div>

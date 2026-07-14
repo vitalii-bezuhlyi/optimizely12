@@ -1,0 +1,30 @@
+@model PageViewModel<ClientReplicaPage>
+
+@{ Layout = "~/Views/Shared/Layouts/_LeftNavigation.cshtml"; }
+
+<div class="content">
+    <h1 epi-property="@Model.CurrentPage.PageName">@Model.CurrentPage.PageName</h1>
+
+    @if (!string.IsNullOrWhiteSpace(Model.CurrentPage.ProductName))
+    {
+        <p class="lead" epi-property="@Model.CurrentPage.ProductName">@Model.CurrentPage.ProductName</p>
+    }
+
+    <p epi-property="@Model.CurrentPage.MetaDescription">@Model.CurrentPage.MetaDescription</p>
+
+    <div class="clearfix">
+        <div epi-property="@Model.CurrentPage.MainBody"></div>
+    </div>
+
+    @if (Model.CurrentPage.KeyFeatures != null && Model.CurrentPage.KeyFeatures.Any())
+    {
+        <ul epi-property="@Model.CurrentPage.KeyFeatures">
+            @foreach (var feature in Model.CurrentPage.KeyFeatures)
+            {
+                <li>@feature</li>
+            }
+        </ul>
+    }
+</div>
+
+<div epi-property="@Model.CurrentPage.MainContentArea" class="row"></div>

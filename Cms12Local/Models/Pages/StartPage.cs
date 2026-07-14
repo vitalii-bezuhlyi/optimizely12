@@ -17,6 +17,7 @@ namespace Cms12Local.Models.Pages;
     [
         typeof(ContainerPage),
         typeof(ProductPage),
+        typeof(ClientReplicaPage),
         typeof(StandardPage),
         typeof(ISearchPage),
         typeof(LandingPage),

@@ -30,6 +30,16 @@ public class Globals
         [Display(Name = "Products", Order = 60)]
         public const string Products = "Products";
 
+        // Custom tabs that mirror the client's catalog product (e.g. JCB 3CX)
+        [Display(Name = "Core Product Information", Order = 61)]
+        public const string CoreProductInformation = "CoreProductInformation";
+
+        [Display(Name = "Product Listing", Order = 62)]
+        public const string ProductListing = "ProductListing";
+
+        [Display(Name = "Commerce Sticky", Order = 63)]
+        public const string CommerceSticky = "CommerceSticky";
+
         [Display(Name = SystemTabNames.Settings, Order = 70)]
         public const string Settings = SystemTabNames.Settings;
 

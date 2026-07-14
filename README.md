@@ -44,15 +44,39 @@ Start the app again and sign in at **https://localhost:5000/util/login**.
 
 ## API authentication
 
-The project is pre-configured with an OpenID Connect client for API access. You can obtain a bearer token using the Resource Owner Password flow.
+Two OpenID Connect clients are pre-configured in `Startup.cs`. Choose the one that matches the Blackbird connection type you want to test.
 
-### Get an access token
+### Resource Owner Password (username + password)
+
+Use this when Blackbird is configured with the **Resource Owner Password** connection type.
 
 ```powershell
 curl -k -X POST "https://localhost:5000/api/episerver/connect/token" -H "Content-Type: application/x-www-form-urlencoded" -d "grant_type=password&client_id=blackbird-local&client_secret=blackbird-local-secret&username=admin&password=Password123!&scope=epi_content_management roles"
 ```
 
-This returns a JSON response with an `access_token` (valid for 1 hour):
+| Setting | Value |
+|---|---|
+| Client ID | `blackbird-local` |
+| Client Secret | `blackbird-local-secret` |
+| Grant type | `password` |
+| Scopes | `openid`, `offline_access`, `roles`, `epi_content_management` |
+
+### Client Credentials (service account)
+
+Use this when Blackbird is configured with the **Client Credentials** connection type. No CMS user account is required; the `BlackbirdLocalClientClaimsTransformation` injects editor roles automatically so the Content Management API accepts the token.
+
+```powershell
+curl -k -X POST "https://localhost:5000/api/episerver/connect/token" -H "Content-Type: application/x-www-form-urlencoded" -d "grant_type=client_credentials&client_id=blackbird-cc&client_secret=blackbird-cc-secret&scope=epi_content_management"
+```
+
+| Setting | Value |
+|---|---|
+| Client ID | `blackbird-cc` |
+| Client Secret | `blackbird-cc-secret` |
+| Grant type | `client_credentials` |
+| Scopes | `epi_content_management` |
+
+Both requests return a JSON response with an `access_token` (valid for 1 hour):
 
 ```json
 {
@@ -61,19 +85,6 @@ This returns a JSON response with an `access_token` (valid for 1 hour):
   "expires_in": 3599
 }
 ```
-
-### OpenID Connect client configuration
-
-The client is registered in `Startup.cs`:
-
-| Setting | Value |
-|---|---|
-| Client ID | `blackbird-local` |
-| Client Secret | `blackbird-local-secret` |
-| Grant type | `password` (Resource Owner Password) |
-| Scopes | `openid`, `offline_access`, `roles`, `epi_content_management` |
-
-> **Note:** The `client_credentials` grant type does not attach a user identity to the token, which causes 403 errors on the Content Management API. Always use the `password` grant with a valid CMS user.
 
 ## API usage
 

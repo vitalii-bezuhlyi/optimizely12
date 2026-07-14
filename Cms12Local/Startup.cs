@@ -56,10 +56,22 @@ public class Startup
                         ContentManagementApiOptionsDefaults.Scope
                     }
                 });
+                options.Applications.Add(new OpenIDConnectApplication
+                {
+                    ClientId = "blackbird-cc",
+                    ClientSecret = "blackbird-cc-secret",
+                    Scopes =
+                    {
+                        ContentManagementApiOptionsDefaults.Scope
+                    }
+                });
             },
             configureSqlServerOptions: _ => { });
 
         services.AddOpenIDConnectUI();
+
+        services.AddOpenIddict()
+            .AddServer(builder => builder.AddEventHandler(ClientCredentialsRolesEnricher.Descriptor));
 
         services.AddContentManagementApi(OpenIDConnectOptionsDefaults.AuthenticationScheme, options =>
         {
